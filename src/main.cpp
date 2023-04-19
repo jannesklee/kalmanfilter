@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Eigen/Dense"
-#include "KalmanFilter.h"
+#include "KalmanFilter.hpp"
 
 using namespace std;
 using Eigen::VectorXd;
