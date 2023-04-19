@@ -1,0 +1,6 @@
+[submodule "deps/Eigen"]
+	path = deps/Eigen
+	url = https://gitlab.com/libeigen/eigen.git
+[submodule "deps/deps/Eigen"]
+	path = deps/Eigen
+	url = https://gitlab.com/libeigen/eigen.git
