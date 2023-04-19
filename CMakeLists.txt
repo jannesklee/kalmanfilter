@@ -14,4 +14,9 @@ set(SOURCE_FILES src/main.cpp src/KalmanFilter.cpp)
 # generate executable
 add_executable(KalmanFilter ${SOURCE_FILES})
 
+# include nlohmann_json
+find_package(nlohmann_json 3.2.0 REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${nlohmann_json_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
 

@@ -1,10 +1,13 @@
 #include <iostream>
+#include <fstream>
 #include "Eigen/Dense"
 #include "KalmanFilter.hpp"
+#include <nlohmann/json.hpp>
 
 using namespace std;
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
+using json = nlohmann::json;
 
 int main() {
     KalmanFilter kf;
