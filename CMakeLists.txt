@@ -9,7 +9,7 @@ include_directories(deps/Eigen)
 include_directories(include)
 
 # set source files
-set(SOURCE_FILES src/main.cpp src/KalmanFilter.cpp)
+set(SOURCE_FILES src/main.cpp src/KalmanFilter.cpp src/gps_data.cpp)
 
 # generate executable
 add_executable(KalmanFilter ${SOURCE_FILES})

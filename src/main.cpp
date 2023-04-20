@@ -3,6 +3,8 @@
 #include "Eigen/Dense"
 #include "KalmanFilter.hpp"
 #include <nlohmann/json.hpp>
+#include "gps_data.hpp"
+
 
 using namespace std;
 using Eigen::VectorXd;
@@ -10,78 +12,73 @@ using Eigen::MatrixXd;
 using json = nlohmann::json;
 
 int main() {
-    KalmanFilter kf;
+    Eigen::VectorXd z(4); // measurement vector
+                          //
+    // Load configuration file
+    ifstream ifs("../examples/gps.json");
+    json config;
+    ifs >> config;
 
-    // initial state vector
+
+    // Read configuration values
     VectorXd x(4);
-    x << 1, 1, 1, 1;
+    x << config["state"][0], config["state"][1], config["state"][2], config["state"][3];
 
-    // initial covariance matrix
     MatrixXd P(4, 4);
-    P << 1, 0, 0, 0,
-         0, 1, 0, 0,
-         0, 0, 1000, 0,
-         0, 0, 0, 1000;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            P(i, j) = config["covariance"][i][j];
+        }
+    }
 
-    // state transition matrix
     MatrixXd F(4, 4);
-    F << 1, 0, 1, 0,
-         0, 1, 0, 1,
-         0, 0, 1, 0,
-         0, 0, 0, 1;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            F(i, j) = config["F"][i][j];
+        }
+    }
 
-    // measurement matrix
     MatrixXd H(2, 4);
-    H << 1, 0, 0, 0,
-         0, 1, 0, 0;
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            H(i, j) = config["H"][i][j];
+        }
+    }
 
-    // measurement covariance matrix
     MatrixXd R(2, 2);
-    R << 0.0225, 0,
-         0, 0.0225;
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            R(i, j) = config["R"][i][j];
+        }
+    }
 
-    // process covariance matrix
     MatrixXd Q(4, 4);
-    Q << 1, 0, 1, 0,
-         0, 1, 0, 1,
-         1, 0, 1, 0,
-         0, 1, 0, 1;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            Q(i, j) = config["Q"][i][j];
+        }
+    }
 
-    // initialize Kalman filter
-    kf.init(x, P, F, H, R, Q);
-
-    // create a vector of measurements
-    vector<VectorXd> measurements;
-    VectorXd meas(2);
-    meas << 1.1, 0.9;
-    measurements.push_back(meas);
-    meas << 2.2, 1.9;
-    measurements.push_back(meas);
-    meas << 3.3, 2.8;
-    measurements.push_back(meas);
-    meas << 4.4, 3.7;
-    measurements.push_back(meas);
-    meas << 5.5, 4.6;
-    measurements.push_back(meas);
-    meas << 6.6, 5.5;
-    measurements.push_back(meas);
-    meas << 7.7, 6.4;
-    measurements.push_back(meas);
-    meas << 8.8, 7.3;
-    measurements.push_back(meas);
-    meas << 9.9, 8.2;
-    measurements.push_back(meas);
-    meas << 10.1, 9.1;
-    measurements.push_back(meas);
-
-    // perform Kalman filtering on the measurements
-    for (size_t i = 0; i < measurements.size(); ++i) {
-        kf.predict();
-        kf.update(measurements[i]);
-        VectorXd state = kf.getState();
-        cout << "State [" << state(0) << ", " << state(1) << ", " << state(2) << ", " << state(3) << "]" << endl;
+    string data_type = config["positioning_data_type"];
+    cout << config["gps_data"] << endl;
+    if (data_type == "gps") {
+        GPSData gps_data = config["gps_data"];
+        KalmanFilter kf;
+        kf.init(x, P, F, H, R, Q);
+        z << gps_data.lat, gps_data.lon, gps_data.alt, gps_data.hdop;
+        kf.update(z);
+        // ...
+    }
+    else if (data_type == "lidar") {
+        // handle lidar data
+    }
+    else if (data_type == "radar") {
+        // handle radar data
+    }
+    else {
+        cerr << "Unknown positioning data type: " << data_type << endl;
+        return 1;
     }
 
     return 0;
 }
-
