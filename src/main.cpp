@@ -12,7 +12,7 @@ using Eigen::MatrixXd;
 using json = nlohmann::json;
 
 int main() {
-    Eigen::VectorXd z(4); // measurement vector
+    Eigen::VectorXd z(2); // measurement vector
                           //
     // Load configuration file
     ifstream ifs("../examples/gps.json");
@@ -60,12 +60,11 @@ int main() {
     }
 
     string data_type = config["positioning_data_type"];
-    cout << config["gps_data"] << endl;
     if (data_type == "gps") {
         GPSData gps_data = config["gps_data"];
         KalmanFilter kf;
         kf.init(x, P, F, H, R, Q);
-        z << gps_data.lat, gps_data.lon, gps_data.alt, gps_data.hdop;
+        z << gps_data.lat, gps_data.lon;
         kf.update(z);
         // ...
     }

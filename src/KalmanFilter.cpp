@@ -1,4 +1,7 @@
+#include <iostream>
 #include "KalmanFilter.hpp"
+
+using namespace std;
 
 KalmanFilter::KalmanFilter() {}
 
