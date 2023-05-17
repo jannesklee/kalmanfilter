@@ -11,68 +11,60 @@ using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using json = nlohmann::json;
 
+
+// Function to load a matrix from JSON
+MatrixXd loadMatrixFromJson(const json& matrixJson) {
+    const size_t rows = matrixJson.size();
+    const size_t cols = matrixJson[0].size();
+
+    MatrixXd matrix(rows, cols);
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            matrix(i, j) = matrixJson[i][j];
+        }
+    }
+
+    return matrix;
+}
+
+// Function to load a vector from JSON
+VectorXd loadVectorFromJson(const json& vectorJson) {
+    const size_t size = vectorJson.size();
+    VectorXd vector(size);
+    for (size_t i = 0; i < size; ++i) {
+        vector[i] = vectorJson[i];
+    }
+    return vector;
+}
+
 int main() {
+    int x_size, P_size, F_size, H_size_dim1, H_size_dim2, R_size, Q_size;
+
     // Load configuration file
-//    ifstream ifs("../examples/gps.json");
-//    json config;
-//    ifs >> config;
-    // Load configuration file
-    ifstream ifs("../examples/ball.json");
+    ifstream ifs("../examples/gps.json");
     json config;
     ifs >> config;
+    // Load configuration file
+//    ifstream ifs("../examples/ball.json");
+//    json config;
+//    ifs >> config;
 
     // Read configuration values
-    VectorXd x(config["state"].size());
-    for (int i = 0; i < config["state"].size(); ++i) {
-        x[i] = config["state"][i];
-    }
-
-    MatrixXd P(4, 4);
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            P(i, j) = config["covariance"][i][j];
-        }
-    }
-
-    MatrixXd F(4, 4);
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            F(i, j) = config["F"][i][j];
-        }
-    }
-
-    MatrixXd H(2, 4);
-    for (int i = 0; i < 2; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            H(i, j) = config["H"][i][j];
-        }
-    }
-
-    MatrixXd R(2, 2);
-    for (int i = 0; i < 2; ++i) {
-        for (int j = 0; j < 2; ++j) {
-            R(i, j) = config["R"][i][j];
-        }
-    }
-
-    MatrixXd Q(4, 4);
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            Q(i, j) = config["Q"][i][j];
-        }
-    }
-
-
-    cout << config["Q"].size() << endl;
+    VectorXd x = loadVectorFromJson(config["state"]);
+    MatrixXd P = loadMatrixFromJson(config["covariance"]);
+    MatrixXd F = loadMatrixFromJson(config["F"]);
+    MatrixXd H = loadMatrixFromJson(config["H"]);
+    MatrixXd R = loadMatrixFromJson(config["R"]);
+    MatrixXd Q = loadMatrixFromJson(config["Q"]);
 
     string data_type = config["positioning_data_type"];
 
     if (data_type == "gps") {
-//        GPSData gps_data = config["gps_data"];
+        GPSData gps_data = config["gps_data"];
         KalmanFilter kf;
-//        kf.init(x, P, F, H, R, Q);
-//        z << gps_data.lat, gps_data.lon;
-//        kf.update(z);
+        kf.init(x, P, F, H, R, Q);
+        x << gps_data.lat, gps_data.lon;
+    //    kf.update(z);
         // ...
     }
     else if (data_type == "lidar") {
