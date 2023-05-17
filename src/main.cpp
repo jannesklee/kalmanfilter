@@ -12,17 +12,20 @@ using Eigen::MatrixXd;
 using json = nlohmann::json;
 
 int main() {
-    Eigen::VectorXd z(2); // measurement vector
-                          //
     // Load configuration file
-    ifstream ifs("../examples/gps.json");
+//    ifstream ifs("../examples/gps.json");
+//    json config;
+//    ifs >> config;
+    // Load configuration file
+    ifstream ifs("../examples/ball.json");
     json config;
     ifs >> config;
 
-
     // Read configuration values
-    VectorXd x(4);
-    x << config["state"][0], config["state"][1], config["state"][2], config["state"][3];
+    VectorXd x(config["state"].size());
+    for (int i = 0; i < config["state"].size(); ++i) {
+        x[i] = config["state"][i];
+    }
 
     MatrixXd P(4, 4);
     for (int i = 0; i < 4; ++i) {
@@ -59,13 +62,17 @@ int main() {
         }
     }
 
+
+    cout << config["Q"].size() << endl;
+
     string data_type = config["positioning_data_type"];
+
     if (data_type == "gps") {
-        GPSData gps_data = config["gps_data"];
+//        GPSData gps_data = config["gps_data"];
         KalmanFilter kf;
-        kf.init(x, P, F, H, R, Q);
-        z << gps_data.lat, gps_data.lon;
-        kf.update(z);
+//        kf.init(x, P, F, H, R, Q);
+//        z << gps_data.lat, gps_data.lon;
+//        kf.update(z);
         // ...
     }
     else if (data_type == "lidar") {
