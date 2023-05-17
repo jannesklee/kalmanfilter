@@ -9,17 +9,17 @@ KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::init(Eigen::VectorXd &x_in, Eigen::MatrixXd &P_in, Eigen::MatrixXd &F_in,
                         Eigen::MatrixXd &H_in, Eigen::MatrixXd &R_in, Eigen::MatrixXd &Q_in) {
-    x_ = x_in;
-    P_ = P_in;
-    F_ = F_in;
-    H_ = H_in;
-    R_ = R_in;
-    Q_ = Q_in;
+    x_ = x_in; // state vector
+    P_ = P_in; // state covariance matrix
+    F_ = F_in; // state transition matrix
+    H_ = H_in; // measurement matrix
+    R_ = R_in; // measurement covariance matrix
+    Q_ = Q_in; // process covariance matrix
     is_initialized_ = true;
 }
 
 void KalmanFilter::predict() {
-    x_ = F_ * x_;
+    x_ = F_ * x_;  // + B*u;?
     P_ = F_ * P_ * F_.transpose() + Q_;
 }
 
