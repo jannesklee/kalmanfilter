@@ -10,7 +10,7 @@ used to estimating the state of a system based on noisy sensor measurements.
 
 ## Installation
 
-    git clone --recurse-submodules https://github.com/<username>/kalmanfilter.git
+    git clone --recurse-submodules https://github.com/jannesklee/kalmanfilter.git
     cd kalmanfilter & mkdir build & cd build
     cmake ..
     make
